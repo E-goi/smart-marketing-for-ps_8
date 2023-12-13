@@ -834,20 +834,46 @@ class SmartMarketingPs extends Module
 	  	return true;
 	}
 
-//	/**
-//    * Enable module.
-//    *
-//    * @return $force_all
-//    * @param bool
-//    */
-//    public function enable($force_all = false)
-//    {
-//        $this->registerHooksEgoi();
-//        if( !parent::enable($force_all) || !$this->installDb() || !$this->createMenu()){
-//            return false;
-//        }
-//        return true;
-//    }
+	/**
+    * Enable module.
+    *
+    * @return $force_all
+    * @param bool
+    */
+    public function enable($force_all = false)
+    {
+
+        if( !parent::enable($force_all)){
+
+            $this->_errors[] = $this->l("Error: Failed to enable from parent.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to enable from parent::" . implode('::', $this->_errors));
+
+            return false;
+        }
+
+        if (!$this->installDb()) {
+            $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables");
+            return false;
+        }
+        if (!$this->createMenu()) {
+            $this->_errors[] = $this->l("Error: Failed to create e-goi menu.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi menu");
+            return false;
+        }
+        if (!$this->registerHooksEgoi()) {
+            $this->_errors[] = $this->l("Error: Failed to register webhooks.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks");
+            return false;
+        }
+
+        // register WebService
+        $this->registerWebService();
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::INSTALL OK");
+        return true;
+
+
+    }
 
 //    /**
 //    * Disable module.
