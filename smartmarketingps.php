@@ -331,21 +331,27 @@ class SmartMarketingPs extends Module
             PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to install from parent::" . implode('::', $this->_errors));
             return false;
         }
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::parent::install() OK");
+
         if (!$this->installDb()) {
             $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables" . implode('::', $this->_errors));
             return false;
         }
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::this->installDb() OK");
+
         if (!$this->createMenu()) {
             $this->_errors[] = $this->l("Error: Failed to create e-goi menu.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi menu");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi menu" . implode('::', $this->_errors));
             return false;
         }
+
         if (!$this->registerHooksEgoi()) {
             $this->_errors[] = $this->l("Error: Failed to register webhooks.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks" . implode('::', $this->_errors));
             return false;
         }
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::this->registerHooksEgoi() OK");
 
 	    // register WebService
 		$this->registerWebService();
@@ -871,9 +877,10 @@ class SmartMarketingPs extends Module
 	public function registerWebService()
 	{
         try {
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
             $row = Db::getInstance()
                 ->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
-
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
             if(empty($row)) {
                 Db::getInstance()->insert('webservice_account', array(
                     'key' => md5(time().uniqid('egoi')),
@@ -881,17 +888,18 @@ class SmartMarketingPs extends Module
                     'description' => "E-goi",
                     'active' => 1
                 ));
-
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
                 $row = Db::getInstance()
                     ->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
             }
 
             if(!empty($row)) {
                 $id_webservice = $row['id_webservice_account'];
-
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
                 $row_webservice_account = Db::getInstance()
                     ->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account_shop WHERE id_webservice_account="'.$id_webservice.'"');
-
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
                 if (empty($row_webservice_account)) {
                     // add webservice relation
                     Db::getInstance()->insert(
@@ -902,11 +910,12 @@ class SmartMarketingPs extends Module
                         )
                     );
                 }
-
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
                 $row_webservice_permission = Db::getInstance()
                     ->getRow(
                         'SELECT id_webservice_account FROM ' . _DB_PREFIX_ . 'webservice_permission WHERE id_webservice_account="' . $id_webservice . '"'
                     );
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
                 if (empty($row_webservice_permission)) {
                     // assign webservice permissions
                     Db::getInstance()->insert(
@@ -918,14 +927,16 @@ class SmartMarketingPs extends Module
                         )
                     );
                 }
-
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
                 // install custom overrides
                 $this->installSmartOverrides();
+                PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
                 return true;
             }
         } catch (Exception $e) {
             PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: {$e->getMessage()}");
         }
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
 
 		return false;
 	}
@@ -2483,6 +2494,8 @@ class SmartMarketingPs extends Module
      */
     private function installSmartOverrides()
     {
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::PASSED OK");
+
         @copy(
             dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php',
             dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
