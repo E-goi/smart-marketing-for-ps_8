@@ -346,11 +346,11 @@ class SmartMarketingPs extends Module
             return false;
         }
 
-        if (!$this->registerHooksEgoi()) {
-            $this->_errors[] = $this->l("Error: Failed to register webhooks.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks" . implode('::', $this->_errors));
-            return false;
-        }
+//        if (!$this->registerHooksEgoi()) {
+//            $this->_errors[] = $this->l("Error: Failed to register webhooks.");
+//            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks" . implode('::', $this->_errors));
+//            return false;
+//        }
         PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::this->registerHooksEgoi() OK");
 
 	    // register WebService
