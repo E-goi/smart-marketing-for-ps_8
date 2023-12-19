@@ -169,7 +169,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '3.0.1';
+	    $this->version = '3.0.2';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -861,6 +861,7 @@ class SmartMarketingPs extends Module
             PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi menu");
             return false;
         }
+
         if (!$this->registerHooksEgoi()) {
             $this->_errors[] = $this->l("Error: Failed to register webhooks.");
             PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks");
@@ -2501,32 +2502,6 @@ class SmartMarketingPs extends Module
         }
         return Cache::retrieve($query);
 	}
-
-	/**
-     * Process Overrides
-     *
-     * @return void
-     */
-    private function installSmartOverrides()
-    {
-        @copy(
-            dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php',
-            dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
-        );
-
-        $this->cleanCache();
-    }
-
-    /**
-     * Remove overrides
-     *
-     * @return void
-     */
-    private function uninstallSmartOverrides()
-    {
-        @unlink(dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
-        $this->cleanCache();
-    }
 
     /**
      * Clean Index class from cache for Dev && Production
