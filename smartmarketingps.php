@@ -813,8 +813,6 @@ class SmartMarketingPs extends Module
 		// remove webservice
 		$this->uninstallWebService();
 
-		// remove overrides
-		$this->uninstallSmartOverrides();
 
    		// remove custom override file
    		@unlink(dirname(__FILE__).$this->custom_override);
@@ -946,8 +944,6 @@ class SmartMarketingPs extends Module
                     );
                 }
 
-                // install custom overrides
-                $this->installSmartOverrides();
                 return true;
             }
         } catch (Exception $e) {
