@@ -2622,6 +2622,25 @@ class SmartMarketingPs extends Module
         $order = new Order($params['id_order']);
         $products = $order->getProducts();
 
+        //Get the Product Categories
+        foreach ($products as &$product) {
+            $productCategories = Product::getProductCategories($product['product_id']);
+        
+            // Checks if the product has associated categories
+            if (!empty($productCategories)) {
+                $categoryNames = array();
+                foreach ($productCategories as $categoryId) {
+                    $category = new Category($categoryId);
+                    $categoryNames[] = $category->getName();
+                }
+                // Add category names to the product
+                $product['category_names'] = $categoryNames;
+            } else {
+                // If there are no associated categories, category_names will be an empty array
+                $product['category_names'] = array();
+            }
+        }
+
         $customer = new Customer($order->id_customer);
 
         $list_id = $res['list_id'];

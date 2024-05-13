@@ -28,7 +28,7 @@ class TESDK
         foreach ($order['products'] as $product){
             $id = empty($product["variant_id"])?$product["id_product"]:$product["variant_id"];
             $product_price = empty($product['product_price_wt'])?$product['product_price']:$product['product_price_wt'];
-            $ec_items[] = ["{$id}",htmlentities($product['product_name']),"",number_format($product_price,2), $product['product_quantity']];
+            $ec_items[] = ["{$id}",htmlentities($product['product_name']),$product['category_names'],number_format($product_price,2), $product['product_quantity']];
         }
 
         $data = [
