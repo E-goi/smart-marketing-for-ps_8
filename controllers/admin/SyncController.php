@@ -166,7 +166,17 @@ class SyncController extends SmartMarketingBaseController
 
 				$this->assign('mapped_fields', $this->getMappedFields());
 			}
+            
+            $listValue = Db::getInstance()->getValue("SELECT list_id FROM "._DB_PREFIX_."egoi"); 
+            if($listValue == 0){
+                $list_altered = false;
+            }else{
+                $list_altered = true;
+            }
 
+
+            $this->assign('list_altered', $list_altered);
+            $this->assign('listValue', $listValue);
 			$this->assign('token', Tools::getValue('token'));
 			$this->assign('content', $this->fetch('sync.tpl'));
 		}

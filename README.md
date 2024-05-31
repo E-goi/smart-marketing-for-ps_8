@@ -1,4 +1,4 @@
-# Egoi Email Marketing for Prestashop 8.X.X (V.3.0.4)
+# Egoi Email Marketing for Prestashop 8.X.X (V.3.0.5)
 
 Keep your contacts sync with E-goi and increase your sales! Easily design email marketing or SMS campaigns, create the segmentation you want for your contacts or build intuitive automation processes for all channels available on E-goi.
 
@@ -33,6 +33,12 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
+-- V.3.0.5
+   -- Fix errors on debug mode
+   -- Removed listing of contact lists and creation of contact lists from the plugin's account page
+   -- On the customer sync page, locked list of listings to the one originally chosen
+   -- Bump plugin version to 3.0.5
+
 -- V.3.0.4
    -- Added verification for when there are no customers and no customers who have subscribed to the newsletter
    -- Bump plugin version to 3.0.4

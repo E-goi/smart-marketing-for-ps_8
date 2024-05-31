@@ -11,7 +11,6 @@
 <div class="panel">
 	<div class="egoi panel-heading"><span class="icon-group" id="subs"></span> <span class="baseline">{l s='My Subscribers' mod='smartmarketingps'}</span></div>
     <form method="post">
-
     	<span id="sub_in_egoi" style="display: none;">{l s='Subscribed in E-goi (Active)' mod='smartmarketingps'}</span>
     	<span id="sub_in_ps" style="display: none;">{l s='Subscribed in PrestaShop' mod='smartmarketingps'}</span>
 
@@ -37,22 +36,34 @@
 					{if !$lists.items}
 						{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
 					{else}
-						<select name="list" id="egoi_lists">
-							<option disabled>
-								{l s='Select a list..' mod='smartmarketingps'}
-							</option>
+						{if isset($list_altered) && $list_altered == false}
+							<select name="list" id="egoi_lists" style="border: 1px solid #ccc; -webkit-appearance: none; -moz-appearance: none; appearance: none;">
+								{foreach $lists.items as $list}
+									{if isset($list_id) && ($list_id eq $list.list_id)}
+										<option value="{$list.list_id|escape:'htmlall':'UTF-8'}" selected="selected">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
+									{else}
+										<option value="{$list.list_id|escape:'htmlall':'UTF-8'}">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
+									{/if}
+								{/foreach}
+							</select>
+						{else}
+							<select disabled name="list_disabled" id="egoi_lists_disabled" style="border: 1px solid #ccc; -webkit-appearance: none; -moz-appearance: none; appearance: none;">
+								{foreach $lists.items as $list}
+									{if isset($list_id) && ($list_id eq $list.list_id)}
+										<option value="{$list.list_id|escape:'htmlall':'UTF-8'}" selected="selected">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
+									{else}
+										<option value="{$list.list_id|escape:'htmlall':'UTF-8'}">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
+									{/if}
+								{/foreach}
+							</select>
+    						<input type="hidden" name="list" id="egoi_lists" value="{if isset($listValue) && $listValue !== null}{$listValue|escape:'htmlall':'UTF-8'}{/if}">
+						{/if}
 
-							{foreach $lists.items as $list}
-								{if isset($list_id) and ($list_id eq $list.list_id)}
-									<option value="{$list.list_id|escape:'htmlall':'UTF-8'}" selected="selected">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
-								{else}
-									<option value="{$list.list_id|escape:'htmlall':'UTF-8'}">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
-								{/if}
-
-							{/foreach}
-
-						</select>
-						<p>{l s='Select the list to synchronize your PS customers base with.' mod='smartmarketingps'}</p>
+						{if isset($list_altered) && $list_altered == false}
+							<p>{l s='Choose the list your PrestaShop clients will be synched with.' mod='smartmarketingps'}</p>
+						{else}
+							<p>{l s='This list will be synchronised with your PrestaShop clients. If you want to modify the list, you will need to remove the current integration and create a new one.' mod='smartmarketingps'}</p>
+						{/if}
 					{/if}
 				</td>
 			</tr>

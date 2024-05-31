@@ -13,8 +13,6 @@
 		<span class="icon-user" id="account"></span> <span class="baseline">{l s='Account Details' mod='smartmarketingps'}</span>
 	</div>
 
-	{$clientData}
-
 	{if $clientData}
 		<table class="table">
 			<thead>
@@ -46,6 +44,4 @@
 		{l s='Error retrieving client data' mod='smartmarketingps'}
 	{/if}
 </div>
-
-{include file='./lists.tpl'}
 
