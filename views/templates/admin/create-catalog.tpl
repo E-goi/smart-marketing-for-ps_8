@@ -35,6 +35,48 @@
             </tr>
 
             <tr>
+                <th class="egoi-td" scope="row">{l s='Enable product descriptions synchronization' mod='smartmarketingps'}</th>
+                <td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+                            <input type="radio" name="descriptionsSync" id="descriptionsSync0" value="1" checked>
+							<label for="catalog-sync0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="descriptionsSync" id="descriptionsSync1" value="0">
+							<label for="catalog-sync1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+                    <p class="help">{l s='Select "yes" if you want to activate synchronization of porducts descriptions for this catalog' mod='smartmarketingps'}</p>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="egoi-td" scope="row">{l s='Enable product categories synchronization' mod='smartmarketingps'}</th>
+                <td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+                            <input type="radio" name="categoriesSync" id="categoriesSync0" value="1" checked>
+							<label for="catalog-sync0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="categoriesSync" id="categoriesSync1" value="0">
+							<label for="catalog-sync1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+                    <p class="help">{l s='Select "yes" if you want to activate synchronization of porducts categories for this catalog' mod='smartmarketingps'}</p>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="egoi-td" scope="row">{l s='Enable related products synchronization' mod='smartmarketingps'}</th>
+                <td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+                            <input type="radio" name="relatedSync" id="relatedSync0" value="1" checked>
+							<label for="catalog-sync0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="relatedSync" id="relatedSync1" value="0">
+							<label for="catalog-sync1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+                    <p class="help">{l s='Select "yes" if you want to activate synchronization of related porducts for this catalog' mod='smartmarketingps'}</p>
+                </td>
+            </tr>
+
+            <tr>
                 <th class="egoi-td" scope="row">{l s='Synchronization Active' mod='smartmarketingps'}</th>
                 <td class="nowrap input-group">
 						<span class="switch prestashop-switch fixed-width-lg">
