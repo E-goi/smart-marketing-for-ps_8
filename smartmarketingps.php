@@ -1583,7 +1583,7 @@ class SmartMarketingPs extends Module
             [
                 $order->reference,
                 $orderStatus->name,
-                $mb['total_cost'],
+                number_format($mb['total_cost'], 2, '.', ''),
                 $currency->sign,
                 $mb['entity'],
                 $mb['reference'],
