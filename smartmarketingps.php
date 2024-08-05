@@ -128,7 +128,7 @@ class SmartMarketingPs extends Module
             'class_name' => 'Account',
             'visible' => true,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingpsaccount.png',
+            'icon' => 'settings_applications',
             'position' => 0,
         ],
         [
@@ -137,7 +137,7 @@ class SmartMarketingPs extends Module
             'class_name' => 'Sync',
             'visible' => false,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingpsync.png',
+            'icon' => 'sync',
             'position' => 0,
         ],
         [
@@ -146,7 +146,7 @@ class SmartMarketingPs extends Module
             'class_name' => 'SmsNotifications',
             'visible' => false,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingsmsnotifications.png',
+            'icon' => 'textsms',
             'position' => 0,
         ],
         [
@@ -155,7 +155,7 @@ class SmartMarketingPs extends Module
             'class_name' => 'Products',
             'visible' => false,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingproducts.png',
+            'icon' => 'shop',
             'position' => 0,
         ],
     ];
@@ -357,6 +357,7 @@ class SmartMarketingPs extends Module
 
 	    // register WebService
 		$this->registerWebService();
+		$this->updateApp();
         PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::INSTALL OK");
 	  	return true;
 	}
@@ -404,6 +405,26 @@ class SmartMarketingPs extends Module
         }
 		return $return;
     }
+
+
+    /**
+     * @return int|true
+     */
+    protected function updateApp()
+    {
+        $updateql = array();
+        include dirname(__FILE__) . '/install/update.php';
+        foreach ($updateql as $u){
+            try {
+                Db::getInstance()->execute($u);
+            } catch (Exception $e) {
+                continue;
+            }
+        }
+
+        return true;
+    }
+
 
     /**
      * Maps order state templates
@@ -1116,7 +1137,9 @@ class SmartMarketingPs extends Module
                     continue;
                 }
 
-                $data = static::mapProduct($product, $langId, $currencyId);
+                $selectedCatalog = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs WHERE catalog_id=".$catalog['catalog_id']);
+
+                $data = static::mapProduct($product, $langId, $currencyId, !empty($selectedCatalog[0]["sync_descriptions"]), !empty($selectedCatalog[0]["sync_categories"]), !empty($selectedCatalog[0]["sync_related_products"]));
                 $result = $this->apiv3->createProduct($catalog['catalog_id'], $data);
 
                 if (!empty($result['errors']['product_already_exists'])) {
@@ -1175,8 +1198,12 @@ class SmartMarketingPs extends Module
         return true;
     }
 
-    public static function mapProduct($product, $lang, $currency)
+    public static function mapProduct($product, $lang, $currency, $sync_descriptions = true, $sync_categories = true, $sync_related_products = true)
     {
+        $desc = '';
+        $categories = array();
+        $relatedProducts = array();
+
         if (is_array($product)) {
             $product = new Product($product['id_product'], true, $lang);
         } else {
@@ -1185,10 +1212,12 @@ class SmartMarketingPs extends Module
 
         $link = new Link();
 
-        $desc = empty($product->description_short) ? filter_var(substr($product->description,0,800), FILTER_SANITIZE_STRING) : filter_var($product->description_short, FILTER_SANITIZE_STRING);
+        if(!empty($sync_descriptions)) {
+            $desc = empty($product->description_short) ? filter_var(substr($product->description,0,800), FILTER_SANITIZE_STRING) : filter_var($product->description_short, FILTER_SANITIZE_STRING);
+        }
 
-        $price = $product->getPrice(true);
-        $salePrice = $product->getPrice(true);
+        $price = Product::getPriceStatic($product->id, true, null, 2, ',', false, false);
+        $salePrice = Product::getPriceStatic($product->id, true, null, 2, ',', false, true);
 
         if ($price == $salePrice) {
             $salePrice = 0;
@@ -1207,13 +1236,15 @@ class SmartMarketingPs extends Module
         $ssl = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
         $imageUrl = $ssl . $link->getImageLink(isset($product->link_rewrite) ? $product->link_rewrite : $product->name, (int)$img['id_image'], 'home_default');
 
-        $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
+        if(!empty($sync_categories)) {
+            $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
+        }
 
-        $relatedProducts = array();
-
-        $acessories = Product::getAccessoriesLight($lang, $product->id);
-        foreach ($acessories as $item) {
-            $relatedProducts[] = $item['id_product'];
+        if(!empty($sync_related_products)) {
+            $acessories = Product::getAccessoriesLight($lang, $product->id);
+            foreach ($acessories as $item) {
+                $relatedProducts[] = $item['id_product'];
+            }
         }
 
         return array(
@@ -1235,18 +1266,18 @@ class SmartMarketingPs extends Module
 
     private static function buildBreadcrumbs($categories, $lang)
     {
-        $categoryCount = count($categories);
         $result = array();
-        for ($i = 0; $i < $categoryCount; $i++) {
-            $category = new Category($categories[$i], $lang);
-            $breadcrumb = $category->name;
-
-            while ($category->id_parent !== '1' && $category->id_parent !== '0') {
-                $category = new Category($category->id_parent, $lang);
-                $breadcrumb = $category->name . '>' . $breadcrumb;
+        if(!empty($categories))
+        foreach ($categories as $category) {
+            $category = new Category($category, $lang);
+            if(!empty($category->name)) {
+                $breadcrumb = $category->name;
+                while ($category->id_parent > '1') {
+                    $category = new Category($category->id_parent, $lang);
+                    $breadcrumb = $category->name . '>' . $breadcrumb;
+                }
+                $result[] = $breadcrumb;
             }
-
-            $result[] = $breadcrumb;
         }
 
         return $result;

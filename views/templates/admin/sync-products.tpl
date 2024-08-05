@@ -53,6 +53,18 @@
         window.location.replace("{$smarty.server.REQUEST_URI}&toggleSync=" + id + "&value=" + value);
     }
 
+    function toggleDescriptions(id, value) {
+        window.location.replace("{$smarty.server.REQUEST_URI}&toggleDescriptions=" + id + "&value=" + value);
+    }
+
+    function toggleCategories(id, value) {
+        window.location.replace("{$smarty.server.REQUEST_URI}&toggleCategories=" + id + "&value=" + value);
+    }
+
+    function toggleRelated(id, value) {
+        window.location.replace("{$smarty.server.REQUEST_URI}&toggleRelated=" + id + "&value=" + value);
+    }
+
     $(document).ready(function () {
         $('#confirm-delete').click(function () {
             window.location.replace("{$smarty.server.REQUEST_URI}&deleteCatalog=" + $('#confirm-delete').attr('value'));
@@ -138,7 +150,26 @@
 
             <th>
                 <div class="text-center">
-                    <b>{l s='Automatically Sync Products' mod='smartmarketingps'}</b>
+                    <b>{l s='Sync Descriptions' mod='smartmarketingps'}</b>
+                </div>
+            </th>
+
+            <th>
+                <div class="text-center">
+                    <b>{l s='Sync Categories' mod='smartmarketingps'}</b>
+                </div>
+            </th>
+
+            <th>
+                <div class="text-center">
+                    <b>{l s='Sync Related Products' mod='smartmarketingps'}</b>
+                </div>
+            </th>
+
+
+            <th>
+                <div class="text-center">
+                    <b>{l s='Automatically Sync Enabled' mod='smartmarketingps'}</b>
                 </div>
             </th>
 
@@ -166,6 +197,74 @@
                     <td class="data-type text-center">
                         {l s=$catalog.currency mod='smartmarketingps'}
                     </td>
+
+                    <td class="text-center">
+                        {if isset($catalog.sync_descriptions) && $catalog.sync_descriptions == 1}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Disable Descriptions Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleDescriptions({$catalog.catalog_id}, 1)">
+                                    <i class="material-icons action-enabled egoi-enabled">
+                                        check
+                                    </i>
+                                </a>
+                            </span>
+                        {else}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enable Descriptions Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleDescriptions({$catalog.catalog_id}, 0)">
+                                    <i class="material-icons action-disabled egoi-disabled">
+                                        clear
+                                    </i>
+                                </a>
+                            </span>
+                        {/if}
+                    </td>
+
+                    <td class="text-center">
+                        {if isset($catalog.sync_categories) && $catalog.sync_categories == 1}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Disable Categories Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleCategories({$catalog.catalog_id}, 1)">
+                                    <i class="material-icons action-enabled egoi-enabled">
+                                        check
+                                    </i>
+                                </a>
+                            </span>
+                        {else}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enable Categories Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleCategories({$catalog.catalog_id}, 0)">
+                                    <i class="material-icons action-disabled egoi-disabled">
+                                        clear
+                                    </i>
+                                </a>
+                            </span>
+                        {/if}
+                    </td>
+
+                    <td class="text-center">
+                        {if isset($catalog.sync_related_products) && $catalog.sync_related_products == 1}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Disable Related Products Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleRelated({$catalog.catalog_id}, 1)">
+                                    <i class="material-icons action-enabled egoi-enabled">
+                                        check
+                                    </i>
+                                </a>
+                            </span>
+                        {else}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enable Related Products Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleRelated({$catalog.catalog_id}, 0)">
+                                    <i class="material-icons action-disabled egoi-disabled">
+                                        clear
+                                    </i>
+                                </a>
+                            </span>
+                        {/if}
+                    </td>
+
+
                     <td class="text-center">
                         {if isset($catalog.active) && $catalog.active == 1}
                             <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Turn auto-sync off' mod='smartmarketingps'}">
