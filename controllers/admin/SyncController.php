@@ -417,10 +417,12 @@ class SyncController extends SmartMarketingBaseController
 
         $res = SmartMarketingPs::getClientData();
 
-        $list_id            = $res['list_id'];
+        $list_id = $res['list_id'];
+        $roleSync = $res['role'];
 
         $subs = Tools::getValue("subs");
         $store_id = Tools::getValue("store_id");
+
         if(empty($store_id)) {
             try {
                 $store_id = (int)Context::getContext()->shop->id;
@@ -431,6 +433,7 @@ class SyncController extends SmartMarketingBaseController
         $store_name = SmartMarketingPs::getShopsName($store_id);
         $store_filter = 'AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
         // get main customers
+
         $ts = [];
         if(!empty($store_id) && !empty($store_name)){
             array_push($ts, $store_name);
@@ -441,9 +444,11 @@ class SyncController extends SmartMarketingBaseController
         $buff = 1000;
         $count = intval($subs);
 
-        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $sqlc = 'SELECT '._DB_PREFIX_.'customer.id_customer, email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
 
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
+
+        $groups = Group::getGroups(Context::getContext()->language->id, true);
 
         if(empty($getcs)){
             echo json_encode(['error' => 'No users!']);
@@ -460,6 +465,32 @@ class SyncController extends SmartMarketingBaseController
         $allFields = $this->getMappedFields();
 
         foreach($getcs as $row){
+            $row['roles'] = '';
+            $customergroups = Customer::getGroupsStatic((int)$row['id_customer']);
+
+            if(!empty($roleSync)) {
+                if(!in_array($roleSync, $customergroups)) {
+                    continue; // sync only this group
+                }
+            }
+
+            if(!empty($customergroups) && !empty($groups)) {
+                $roles = [];
+                foreach ($customergroups as $customergroup) {
+                    if(!empty($customergroup)) {
+                        foreach ($groups as $r) {
+                            if($r['id_group'] == $customergroup) {
+                                $roles[] = $r['name'];
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!empty($roles)) {
+                $row['roles'] = implode(', ', $roles);
+            }
+
             $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row, $allFields ? $allFields : []);
         }
 

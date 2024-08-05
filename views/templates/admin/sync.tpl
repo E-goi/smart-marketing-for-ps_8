@@ -306,6 +306,7 @@
                                 <option value="birthday">{l s='Birthday' mod='smartmarketingps'}</option>
                                 <option value="newsletter">{l s='Newsletter' mod='smartmarketingps'}</option>
                                 <option value="optin">{l s='Optin' mod='smartmarketingps'}</option>
+                                <option value="roles">{l s='Roles' mod='smartmarketingps'}</option>
                             </select>
                         </div>
 
