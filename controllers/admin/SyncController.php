@@ -444,10 +444,9 @@ class SyncController extends SmartMarketingBaseController
         $buff = 1000;
         $count = intval($subs);
 
-        $sqlc = 'SELECT '._DB_PREFIX_.'customer.id_customer, email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, '._DB_PREFIX_.'newsletter, '._DB_PREFIX_.'optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $sqlc = 'SELECT '._DB_PREFIX_.'customer.id_customer, email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, '._DB_PREFIX_.'customer.newsletter, '._DB_PREFIX_.'customer.optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
 
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
-
 
         if(empty($getcs)){
             echo json_encode(['error' => 'No users!']);
@@ -494,6 +493,9 @@ class SyncController extends SmartMarketingBaseController
 
             $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row, $allFields ? $allFields : []);
         }
+
+
+
 
         $this->apiv3->addSubscriberBulk($list_id, $importContacts);
         Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
