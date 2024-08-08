@@ -444,16 +444,17 @@ class SyncController extends SmartMarketingBaseController
         $buff = 1000;
         $count = intval($subs);
 
-        $sqlc = 'SELECT '._DB_PREFIX_.'customer.id_customer, email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $sqlc = 'SELECT '._DB_PREFIX_.'customer.id_customer, email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, '._DB_PREFIX_.'newsletter, '._DB_PREFIX_.'optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
 
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
-        $groups = Group::getGroups(Context::getContext()->language->id, true);
 
         if(empty($getcs)){
             echo json_encode(['error' => 'No users!']);
             exit;
         }
+
+        $groups = Group::getGroups(Context::getContext()->language->id, true);
 
         $importContacts = [
             'mode' => 'update',
@@ -568,6 +569,7 @@ class SyncController extends SmartMarketingBaseController
         $allFields = $this->getMappedFields();
 
         foreach($getcs as $row){
+            $row['newsletter'] = 1;
             $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row, $allFields ? $allFields : []);
         }
 
