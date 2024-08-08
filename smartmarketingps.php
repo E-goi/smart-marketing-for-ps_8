@@ -1299,6 +1299,7 @@ class SmartMarketingPs extends Module
 
         $list_id            = $res['list_id'];
         $newsletter_sync    = $res['newsletter_sync'];
+        $roleSync = $res['role'];
         $store_id = Tools::getValue("store_id");
         if(empty($store_id)) {
             $store_id = (int)Context::getContext()->shop->id;
@@ -1321,17 +1322,45 @@ class SmartMarketingPs extends Module
             array_push($ts, 'newsletter');
         }
 
-        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= "'. date('Y-m-d H:i:s', $timeSaved) .'" OR '._DB_PREFIX_.'address.date_add >= "'. date('Y-m-d H:i:s', $timeSaved) .'"'.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
+        $sqlc = 'SELECT '._DB_PREFIX_.'customer.id_customer, email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, '._DB_PREFIX_.'newsletter, '._DB_PREFIX_.'optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= "'. date('Y-m-d H:i:s', $timeSaved) .'" OR '._DB_PREFIX_.'address.date_add >= "'. date('Y-m-d H:i:s', $timeSaved) .'"'.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
+
 
         if(empty($getcs)){
             return;
         }
 
+        $groups = Group::getGroups(Context::getContext()->language->id, true);
+
         $data = [];
         $allFields = $this->getMappedFields();
 
         foreach($getcs as $row){
+            $row['roles'] = '';
+            $customergroups = Customer::getGroupsStatic((int)$row['id_customer']);
+
+            if(!empty($roleSync)) {
+                if(!in_array($roleSync, $customergroups)) {
+                    continue; // sync only this group
+                }
+            }
+
+            if(!empty($customergroups) && !empty($groups)) {
+                $roles = [];
+                foreach ($customergroups as $customergroup) {
+                    if(!empty($customergroup)) {
+                        foreach ($groups as $r) {
+                            if($r['id_group'] == $customergroup) {
+                                $roles[] = $r['name'];
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!empty($roles)) {
+                $row['roles'] = implode(', ', $roles);
+            }
             $data[] = SmartMarketingPs::mapSubscriber($row, $allFields);
         }
 
@@ -1934,7 +1963,8 @@ class SmartMarketingPs extends Module
     protected function addNewsletterCustomer($params) {
 
         $fields = array(
-            'email' => $params['email']
+            'email' => $params['email'],
+            'newsletter' => 1
         );
 
         $options = self::getClientData();
@@ -1983,15 +2013,35 @@ class SmartMarketingPs extends Module
         }
 
         $params = $params['object'];
-
         $options = self::getClientData();
+        $roleSync = $options['role'];
 
         if($options['sync']) {
             // check if is a role defined
-            if (!$this->getRole($params['id'], $options['role'])) {
+            if (!empty($roleSync) && !$this->getRole($params['id'], $roleSync)) {
                 return false;
             }
             $allFields = $this->getMappedFields();
+            $customergroups = Customer::getGroupsStatic((int)$params['id']);
+            $groups = Group::getGroups(Context::getContext()->language->id, true);
+
+            if(!empty($customergroups) && !empty($groups)) {
+                $roles = [];
+                foreach ($customergroups as $customergroup) {
+                    if(!empty($customergroup)) {
+                        foreach ($groups as $r) {
+                            if($r['id_group'] == $customergroup) {
+                                $roles[] = $r['name'];
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!empty($roles)) {
+                $params['roles'] = implode(', ', $roles);
+            }
+
             $data = SmartMarketingPs::mapSubscriber($params, $allFields);
 
             $contact = $this->apiv3->createContact($options['list_id'], $data);
@@ -2058,40 +2108,62 @@ class SmartMarketingPs extends Module
      * @param array $params
 	 * @return mixed
 	 */
-	protected function updateCustomer($params)
-	{
-        $params = json_decode(json_encode ( $params ) , true);
+    protected function updateCustomer($params)
+    {
+        $params = json_decode(json_encode($params), true);
 
-        if(empty($params)) {
+        if (empty($params)) {
             return false;
         }
-        $params = $params['object'];
 
+        $params = $params['object'];
         $options = self::getClientData();
+        $roleSync = $options['role'];
 
         if ($options['sync'] && !empty($params['id'])) {
             // check if is a role defined
-            if (!$this->getRole($params['id'], $options['role'])) {
+            if (!empty($roleSync) && !$this->getRole($params['id'], $roleSync)) {
                 return false;
             }
 
-            $uid = Db::getInstance()->getValue('SELECT uid FROM '._DB_PREFIX_."egoi_customer_uid WHERE email='".pSQL($params['email'])."';");
-            if(empty($uid)) {
+            $uid = Db::getInstance()->getValue(
+                'SELECT uid FROM ' . _DB_PREFIX_ . "egoi_customer_uid WHERE email='" . pSQL($params['email']) . "';"
+            );
+            $allFields = $this->getMappedFields();
+            $customergroups = Customer::getGroupsStatic((int)$params['id']);
+            $groups = Group::getGroups(Context::getContext()->language->id, true);
+
+            if (!empty($customergroups) && !empty($groups)) {
+                $roles = [];
+                foreach ($customergroups as $customergroup) {
+                    if (!empty($customergroup)) {
+                        foreach ($groups as $r) {
+                            if ($r['id_group'] == $customergroup) {
+                                $roles[] = $r['name'];
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!empty($roles)) {
+                $params['roles'] = implode(', ', $roles);
+            }
+
+            $data = SmartMarketingPs::mapSubscriber($params, $allFields);
+
+            if (empty($uid)) {
                 $uid = $this->apiv3->searchContactByEmail($params['email'], $options['list_id']);
-                if(!empty($uid)) {
+
+                if (!empty($uid)) {
                     Db::getInstance()->insert('egoi_customer_uid', array(
                         'uid' => $uid,
                         'email' => pSQL($params['email'])
                     ));
-
-                    $allFields = $this->getMappedFields();
-                    $data = SmartMarketingPs::mapSubscriber($params, $allFields);
                     $this->apiv3->patchContact($options['list_id'], $uid, $data);
                 } else {
-                    $allFields = $this->getMappedFields();
-                    $data = SmartMarketingPs::mapSubscriber($params, $allFields);
                     $contact = $this->apiv3->createContact($options['list_id'], $data);
-                    if(!empty($contact['contact_id'])) {
+                    if (!empty($contact['contact_id'])) {
                         Db::getInstance()->insert('egoi_customer_uid', array(
                             'uid' => $contact['contact_id'],
                             'email' => pSQL($data['base']['email'])
@@ -2099,13 +2171,11 @@ class SmartMarketingPs extends Module
                     }
                 }
             } else {
-                $allFields = $this->getMappedFields();
-                $data = SmartMarketingPs::mapSubscriber($params, $allFields);
                 $this->apiv3->patchContact($options['list_id'], $uid, $data);
             }
         }
         return true;
-	}
+    }
 
 	/**
 	 * Delete customer
