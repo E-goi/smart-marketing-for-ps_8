@@ -374,8 +374,10 @@ class SmartMarketingPs extends Module
                 'actionOrderStatusPostUpdate',
                 'actionObjectCategoryUpdateAfter',
                 'actionObjectCategoryDeleteAfter',
+                'hookActionObjectProductAddAfter',
                 'actionObjectProductUpdateAfter',
                 'actionObjectProductDeleteAfter',
+                'actionObjectSpecificPriceAddAfter',
                 'actionNewsletterRegistrationAfter',
                 'displayHome',
                 'displayTop',
@@ -1120,12 +1122,13 @@ class SmartMarketingPs extends Module
         }
     }
 
+
     /**
-     * Hook for product update
+     * Hook for product create
      *
      * @param array $params
      */
-    public function hookActionObjectProductUpdateAfter($params)
+    public function hookActionObjectProductAddAfter($params)
     {
         $product = $params['object'];
         if ($product->active) {
@@ -1140,6 +1143,7 @@ class SmartMarketingPs extends Module
                 $selectedCatalog = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs WHERE catalog_id=".$catalog['catalog_id']);
 
                 $data = static::mapProduct($product, $langId, $currencyId, !empty($selectedCatalog[0]["sync_descriptions"]), !empty($selectedCatalog[0]["sync_categories"]), !empty($selectedCatalog[0]["sync_related_products"]));
+
                 $result = $this->apiv3->createProduct($catalog['catalog_id'], $data);
 
                 if (!empty($result['errors']['product_already_exists'])) {
@@ -1150,6 +1154,28 @@ class SmartMarketingPs extends Module
             }
         }
     }
+
+    /**
+     * Hook for product update
+     *
+     * @param array $params
+     */
+    public function hookActionObjectProductUpdateAfter($params)
+    {
+        return $this->hookActionObjectProductAddAfter($params);
+    }
+
+
+    /**
+     * Hook for product update
+     *
+     * @param array $params
+     */
+    public function hookActionObjectSpecificPriceAddAfter($params)
+    {
+        return $this->hookActionObjectProductAddAfter($params);
+    }
+
 
     /**
      * Hook for product add
