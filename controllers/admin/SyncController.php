@@ -494,9 +494,6 @@ class SyncController extends SmartMarketingBaseController
             $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row, $allFields ? $allFields : []);
         }
 
-
-
-
         $this->apiv3->addSubscriberBulk($list_id, $importContacts);
         Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
 

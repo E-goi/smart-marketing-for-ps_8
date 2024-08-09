@@ -378,6 +378,8 @@ class SmartMarketingPs extends Module
                 'actionObjectProductUpdateAfter',
                 'actionObjectProductDeleteAfter',
                 'actionObjectSpecificPriceAddAfter',
+                'actionObjectSpecificPriceDeleteAfter',
+                'actionObjectSpecificPriceUpdateAfter',
                 'actionNewsletterRegistrationAfter',
                 'displayHome',
                 'displayTop',
@@ -1131,6 +1133,7 @@ class SmartMarketingPs extends Module
     public function hookActionObjectProductAddAfter($params)
     {
         $product = $params['object'];
+
         if ($product->active) {
             $languages = Language::getLanguages(true, Context::getContext()->shop->id);
             $currencies = Currency::getCurrencies(true);
@@ -1149,7 +1152,9 @@ class SmartMarketingPs extends Module
                 if (!empty($result['errors']['product_already_exists'])) {
                     $id = $data['product_identifier'];
                     unset($data['product_identifier']);
-                    $this->apiv3->updateProduct($catalog['catalog_id'], $id, $data);
+
+                   $this->apiv3->updateProduct($catalog['catalog_id'], $id, $data);
+
                 }
             }
         }
@@ -1173,9 +1178,48 @@ class SmartMarketingPs extends Module
      */
     public function hookActionObjectSpecificPriceAddAfter($params)
     {
-        return $this->hookActionObjectProductAddAfter($params);
+
+        $specialPrice = $params['object'];
+        $productId = $specialPrice->id_product;
+
+        $langId = $this->context->language->iso_code;
+
+        $product = new Product($productId, false, $langId);
+
+        if (!empty($product) && $product->active) {
+            $languages = Language::getLanguages(true, Context::getContext()->shop->id);
+            $currencies = Currency::getCurrencies(true);
+            $catalogsEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
+            foreach ($catalogsEnabled as $catalog) {
+                if (!$this->checkLangCurrency($languages, $langId, $currencies, $currencyId, $catalog) || !$catalog['active']) {
+                    continue;
+                }
+
+                $selectedCatalog = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs WHERE catalog_id=".$catalog['catalog_id']);
+
+                $data = static::mapProduct($product, $langId, $currencyId, !empty($selectedCatalog[0]["sync_descriptions"]), !empty($selectedCatalog[0]["sync_categories"]), !empty($selectedCatalog[0]["sync_related_products"]));
+
+                $result = $this->apiv3->createProduct($catalog['catalog_id'], $data);
+
+                if (!empty($result['errors']['product_already_exists'])) {
+                    $id = $data['product_identifier'];
+                    unset($data['product_identifier']);
+                    $this->apiv3->updateProduct($catalog['catalog_id'], $id, $data);
+
+                }
+            }
+        }
     }
 
+    public function hookActionObjectSpecificPriceDeleteAfter($params)
+    {
+        return $this->hookActionObjectSpecificPriceAddAfter($params);
+    }
+
+    public function hookActionObjectSpecificPriceUpdateAfter($params)
+    {
+        return $this->hookActionObjectSpecificPriceAddAfter($params);
+    }
 
     /**
      * Hook for product add
