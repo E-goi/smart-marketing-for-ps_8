@@ -37,6 +37,15 @@ class ProductsController extends SmartMarketingBaseController
     {
         parent::initPageHeaderToolbar();
 
+        // Botão da barra de ferramentas para documentação
+        $this->page_header_toolbar_btn['novo-botao'] = array(
+            'short' => $this->l('E-goi Documentation'),
+            'icon' => 'icon-book',
+            'href' => $this->doc_url,
+            'desc' => $this->l('E-goi Documentation'),
+            'js' => $this->l('$( \'#outro-form\' ).click();')
+        );
+
         $this->page_header_toolbar_btn['goto-egoi'] = array(
             'short' => $this->l('Go to E-goi'),
             'icon' => 'icon-external-link',
@@ -45,6 +54,7 @@ class ProductsController extends SmartMarketingBaseController
             'js' => $this->l('$( \'#save-form\' ).click();')
         );
     }
+
 
     public function initContent()
     {

@@ -42,8 +42,24 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * @var integer
 	 */
 	protected $cfg = 1;
-	
-	/**
+
+    /**
+     * User language
+     *
+     * @var string
+     */
+
+    protected $user_language;
+
+    /**
+     * Documentation URL based on user language
+     *
+     * @var string
+     */
+    protected $doc_url;
+
+
+    /**
 	 * Constructor
 	 */
 	public function __construct() 
@@ -52,13 +68,46 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 		
 		$this->_path = _PS_MODULE_DIR_ . $this->module_name;
 		$this->has_api_key = Configuration::get('smart_api_key') ? true : false;
-		$this->assign('has_api_key', $this->has_api_key);
+
+        //Set User Language
+        $this->user_language = $this->context->language && $this->context->language->iso_code
+            ? $this->context->language->iso_code
+            : 'en';
+
+        $this->assign('user_language', $this->user_language);
+        $this->assign('has_api_key', $this->has_api_key);
 		$this->assign('error_message', '');
 		$this->assign('has_error', false);
+
+        // Set documentation URL based on user language
+        $this->setDocumentationUrl();
 
 		// on failture redirect to configuration page
         $this->assign('redirect', $this->redirectToConfig());
 	}
+
+    /**
+     * Set the documentation URL based on user language
+     */
+    protected function setDocumentationUrl()
+    {
+        // Define URL based on the language
+        switch ($this->user_language) {
+            case 'pt':
+            case 'br':
+                $this->doc_url = 'https://helpdesk.e-goi.com/135674-Integrar-o-E-goi-com-o-PrestaShop';
+                break;
+            case 'en':
+                $this->doc_url = 'https://helpdesk.e-goi.com/525554-Integrating-E-goi-with-PrestaShop';
+                break;
+            case 'es':
+                $this->doc_url = 'https://helpdesk.e-goi.com/538572-Integrar-E-goi-con-PrestaShop';
+                break;
+            default:
+                $this->doc_url = 'https://helpdesk.e-goi.com/538572-Integrar-E-goi-con-PrestaShop';
+                break;
+        }
+    }
 
     /**
      * Sanitizes input

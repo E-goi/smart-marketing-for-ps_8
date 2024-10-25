@@ -66,6 +66,16 @@ class SyncController extends SmartMarketingBaseController
 	public function initPageHeaderToolbar()
     {
         parent::initPageHeaderToolbar();
+
+        // Botão da barra de ferramentas para documentação
+        $this->page_header_toolbar_btn['novo-botao'] = array(
+            'short' => $this->l('E-goi Documentation'),
+            'icon' => 'icon-book',
+            'href' => $this->doc_url,
+            'desc' => $this->l('E-goi Documentation'),
+            'js' => $this->l('$( \'#outro-form\' ).click();')
+        );
+
         $this->page_header_toolbar_btn['save-and-stay'] = array(
 		    'short' => $this->l('Save Settings'),
 		    'href' => '#',
