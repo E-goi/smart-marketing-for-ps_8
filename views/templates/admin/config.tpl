@@ -36,10 +36,19 @@
 
 		<div class="form-group">
 			<p>&nbsp;</p>
-			{l s='To get your API Key, login into your' mod='smartmarketingps'} <a target="_blank" href="https://login.egoiapp.com">BO</a>, {l s='go to your user menu (upper right corner), select "Integrations" and copy the account API key' mod='smartmarketingps'}
+			{l s='To get your API Key, login into your' mod='smartmarketingps'} <a target="_blank" href="https://login.egoiapp.com">BO</a> {l s='go to your user menu (upper right corner), select "Integrations" and copy the account API key' mod='smartmarketingps'}
 		</div>
 
 		<div class="form-group">
+			<a class="btn btn-default" id="egoiDocumentation_button"
+			   href="{l s='egoiDocumentationLink' mod='smartmarketingps'}"
+			   target="_blank">
+				<div style="font-size: 13px; display: inline-block; vertical-align: super;">
+					{l s='E-goi Documentation' mod='smartmarketingps'}
+				</div>
+				<i class="material-icons action-enabled" style="font-size: 18px;">navigate_next</i>
+			</a>
+
 			<a class="btn btn-default" id="account_button">
 				<div style="font-size: 13px;display: inline-block;vertical-align: super;">{l s='Go to My Account' mod='smartmarketingps'}</div>
 				<i class="material-icons action-enabled" style="font-size: 18px;">navigate_next</i>
