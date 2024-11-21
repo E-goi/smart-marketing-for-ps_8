@@ -169,7 +169,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '3.0.7';
+	    $this->version = '3.0.8';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -2541,32 +2541,63 @@ class SmartMarketingPs extends Module
             $subscriber['base']['phone'] = self::parsePhoneNumber($data['call_prefix'], $data['phone']);
         }
 
-        if(!empty($fields)) {
-            foreach ($data as $field => $value){
-                $key = array_search($field, array_column($fields, 'ps'));
+        $idShop = $data['id_shop'];
+        $idLang = $data['id_lang'];
 
-                if($key === false){
+        if (!empty($fields) && !empty($idShop) && !empty($idLang)) {
+            $fieldsIndex = [];
+            foreach ($fields as $field) {
+                $fieldsIndex[$field['ps']] = $field;
+            }
+
+            foreach ($fieldsIndex as $fieldName => $field) {
+                if ($fieldName === 'store_language') {
+                    $languageName = self::getLangName($idLang);
+
+                    // Verify if the field is extra or base
+                    if (strpos($field['egoi'], 'extra') !== false) {
+                        $subscriber['extra'][] = [
+                            'field_id' => (int) str_replace('extra_', '', $field['egoi']),
+                            'value' => $languageName
+                        ];
+                    } else {
+                        $subscriber['base'][$field['egoi']] = $languageName;
+                    }
+                }
+
+                if ($fieldName === 'store_name') {
+                    $storeName = self::getStoreName($idShop);
+                    // Verify if the field is extra or base
+                    if (strpos($field['egoi'], 'extra') !== false) {
+                        $subscriber['extra'][] = [
+                            'field_id' => (int) str_replace('extra_', '', $field['egoi']),
+                            'value' => $storeName
+                        ];
+                    } else {
+                        $subscriber['base'][$field['egoi']] = $storeName;
+                    }
+                }
+            }
+
+            foreach ($data as $key => $value) {
+                if (!isset($fieldsIndex[$key])) {
                     continue;
                 }
 
-                $field = $fields[$key]['egoi'];
-                if(empty($field)){
-                    continue;
-                }
+                $fieldConfig = $fieldsIndex[$key];
+                $field = $fieldConfig['egoi'];
 
-                if(strpos($field, 'extra') !== false) {
-                    $subscriber['extra'] = [
-                        [
-                            'field_id' => (int) str_replace('extra_', '', $field),
-                            'value' => $value
-                        ]
+                if (strpos($field, 'extra') !== false) {
+                    $subscriber['extra'][] = [
+                        'field_id' => (int) str_replace('extra_', '', $field),
+                        'value' => $value
                     ];
                 } else {
-                    if($field == 'telephone') {
-                        $field = 'phone'; //
+                    if ($field === 'telephone') {
+                        $field = 'phone';
                     }
 
-                    if($field == 'phone' || $field == 'cellphone') {
+                    if ($field === 'phone' || $field === 'cellphone') {
                         $value = self::parsePhoneNumber($data['call_prefix'], $value);
                     }
 
@@ -2576,6 +2607,44 @@ class SmartMarketingPs extends Module
         }
 
         return $subscriber;
+    }
+
+    /**
+     * Get Store Name from DB
+     *
+     * @param $id_shop
+     * @return string|null
+     */
+    private static function getStoreName($id_shop)
+    {
+        if (empty($id_shop)) {
+            return null;
+        }
+
+        $shopName = Db::getInstance()->getValue(
+            'SELECT name FROM ' . _DB_PREFIX_ . 'shop WHERE id_shop = ' . (int)$id_shop
+        );
+
+        return $shopName ?: null;
+    }
+
+    /**
+     * Get Client Language from DB
+     *
+     * @param $id_lang
+     * @return string|null
+     */
+    private static function getLangName($id_lang)
+    {
+        if (empty($id_lang)) {
+            return null;
+        }
+
+        $langName = Db::getInstance()->getValue(
+            'SELECT name FROM ' . _DB_PREFIX_ . 'lang WHERE id_lang = ' . (int)$id_lang
+        );
+
+        return $langName ?: null;
     }
 
     /**
