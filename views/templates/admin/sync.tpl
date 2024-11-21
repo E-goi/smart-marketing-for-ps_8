@@ -307,6 +307,8 @@
                                 <option value="newsletter">{l s='Newsletter' mod='smartmarketingps'}</option>
                                 <option value="optin">{l s='Optin' mod='smartmarketingps'}</option>
                                 <option value="roles">{l s='Roles' mod='smartmarketingps'}</option>
+								<option value="store_name">{l s='Store Name' mod='smartmarketingps'}</option>
+								<option value="store_language">{l s='Store Language' mod='smartmarketingps'}</option>
                             </select>
                         </div>
 

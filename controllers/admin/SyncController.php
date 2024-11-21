@@ -67,6 +67,13 @@ class SyncController extends SmartMarketingBaseController
     {
         parent::initPageHeaderToolbar();
 
+        $this->page_header_toolbar_btn['save-and-stay'] = array(
+            'short' => $this->l('Save Settings'),
+            'href' => '#',
+            'desc' => $this->l('Save Settings'),
+            'js' => $this->l('$( \'#action_add\' ).click();')
+        );
+
         // Toolbar button for documentation
         $this->page_header_toolbar_btn['egoiDocumentation'] = array(
             'short' => $this->l('E-goi Documentation'),
@@ -75,13 +82,6 @@ class SyncController extends SmartMarketingBaseController
             'desc' => $this->l('E-goi Documentation'),
             'js' => $this->l('$( \'#outro-form\' ).click();')
         );
-
-        $this->page_header_toolbar_btn['save-and-stay'] = array(
-		    'short' => $this->l('Save Settings'),
-		    'href' => '#',
-		    'desc' => $this->l('Save Settings'),
-		    'js' => $this->l('$( \'#action_add\' ).click();')
-		);
     }
 
     public function countCostumersByShop($newsletter){
