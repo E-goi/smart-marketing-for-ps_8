@@ -128,7 +128,10 @@
 					<th class="egoi-td" scope="row">{l s='Sync custom fields' mod='smartmarketingps'}</th>
 					<td>
 						<button type="button" class="btn btn-info" data-toggle="modal" data-target="#CustomFields">{l s='Map Custom Fields' mod='smartmarketingps'}</button>
-						<p class="help">{l s='Sync custom fields from PrestaShop to E-goi List' mod='smartmarketingps'}</p>
+						<p class="help">
+							{l s='Synchronize PrestaShop custom fields with your E-goi list, including the possibility of mapping ' mod='smartmarketingps'}<br>
+							{l s='the Store Name and the Language Selected by the customer as extra E-goi text fields, for a more personalized synchronization.' mod='smartmarketingps'}<br>
+						</p>
 					</td>
 				</tr>
 

@@ -160,7 +160,8 @@ $_MODULE['<{smartmarketingps}prestashop>sync_807fd99630e69024d31093550e559785'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_7a0a9ce86257a7eb845957491ab841e6'] = 'Already existing PrestaShop clients will be synched with your E-goi list.';
 $_MODULE['<{smartmarketingps}prestashop>sync_7c0b43201656f84c4ed2487a4548ff43'] = 'Sync custom fields';
 $_MODULE['<{smartmarketingps}prestashop>sync_823e2334007d702211213b0d078362d4'] = 'Map custom Fields';
-$_MODULE['<{smartmarketingps}prestashop>sync_43f8ad6b9575cc41e3823379b1f24908'] = 'Any custom fields in your PrestaShop store will be synched to your E-goi list.';
+$_MODULE['<{smartmarketingps}prestashop>sync_7889b7c7df4bbe5957f224e0b481631b'] = 'Synchronize PrestaShop custom fields with your E-goi list, including the possibility of mapping	';
+$_MODULE['<{smartmarketingps}prestashop>sync_0bbb52ba46e87020fd92d10e26ab2891'] = 'the Store Name and the Language selected by the customer as extra E-goi text fields, for a more personalized synchronization.	';
 $_MODULE['<{smartmarketingps}prestashop>sync_7105a8c7eaaed1981b0dda5f44cedae8'] = 'Newsletter module';
 $_MODULE['<{smartmarketingps}prestashop>sync_956f9ca4982d67128e3609316245de79'] = 'Enable Newsletter subscribers auto-sync';
 $_MODULE['<{smartmarketingps}prestashop>sync_eec15ab63a367a481cffaf930baa705d'] = 'Select \"Yes\" if you want to auto-sync newsletter subscribers';
