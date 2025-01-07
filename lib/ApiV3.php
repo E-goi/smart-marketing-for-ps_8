@@ -285,7 +285,6 @@ class ApiV3 extends EgoiRestApi
      */
     public function convertOrder($domain, $order)
     {
-        $domain = "localhost";
         return $this->call('POST', '/'. $domain . '/orders' , $order);
     }
 
