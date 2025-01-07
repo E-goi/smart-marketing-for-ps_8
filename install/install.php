@@ -91,3 +91,36 @@ $sql[_DB_PREFIX_.'egoi_customer_uid'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFI
 			  PRIMARY KEY (`uid`),
 			  INDEX store_email (email)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+
+$sql[_DB_PREFIX_.'egoi_order_states'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi_order_states` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `egoi_id` int(11) NOT NULL,
+              `name` varchar(255) NOT NULL,
+              PRIMARY KEY (`id`),
+              UNIQUE KEY (`egoi_id`)
+            ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+
+$sql[_DB_PREFIX_.'egoi_prestashop_order_state_map'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi_prestashop_order_state_map` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `prestashop_state_id` int(11) NOT NULL,
+    `egoi_state_id` int(11) NOT NULL,
+    `type` varchar(20) NOT NULL,  
+    `active` int(1) NOT NULL DEFAULT \'1\',
+    PRIMARY KEY (`id`)
+) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+
+$sql[_DB_PREFIX_.'egoi_after_order_state_insert'] = '
+    CREATE TRIGGER '._DB_PREFIX_.'egoi_after_order_state_insert
+    AFTER INSERT ON '._DB_PREFIX_.'order_state_lang
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO '._DB_PREFIX_.'egoi_prestashop_order_state_map 
+        (prestashop_state_id, egoi_state_id, type, active)
+        VALUES (NEW.id_order_state, 1, "order", 1);
+    END;
+';
+
+
+
+
+

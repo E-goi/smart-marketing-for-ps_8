@@ -277,6 +277,31 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Creates a new Order
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function convertOrder($domain, $order)
+    {
+        $domain = "localhost";
+        return $this->call('POST', '/'. $domain . '/orders' , $order);
+    }
+
+    /**
+     * Import Current Orders
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function importOrders($listId, $orders)
+    {
+        return $this->call('POST', '/lists/'. $listId . '/orders' , $orders);
+    }
+
+    /**
      * Creates a TE domain
      *
      * @param $domain

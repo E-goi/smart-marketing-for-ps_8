@@ -237,33 +237,6 @@
 						<p class="help">{l s='With Connected Sites active, you will be able to activate Track&Engage as well as insert forms and pop-ups.' mod='smartmarketingps'}</p>
 					</td>
 				</tr>
-				<tr>
-					<th class="egoi-td" scope="row">{l s='Track&Engage order conversion state' mod='smartmarketingps'}</th>
-					<td>
-						<select name="track_state" id="egoi_track_state">
-							<option disabled>
-								{l s='Select a state..' mod='smartmarketingps'}
-							</option>
-
-							{if empty($track_state) }
-								<option value="0" selected="selected">{l s='On new order' mod='smartmarketingps'}</option>
-							{/if}
-
-							{foreach $states as $state}
-
-							{if isset($track_state) and ($track_state eq $state['id_order_state'])}
-								<option value="{$state['id_order_state']}" selected="selected">{$state['name']|escape:'htmlall':'UTF-8'}</option>
-							{else}
-								<option value="{$state['id_order_state']}">{$state['name']|escape:'htmlall':'UTF-8'}</option>
-							{/if}
-
-
-							{/foreach}
-
-						</select>
-						<p class="help">{l s='Select the order state you\'d like conversions apear in e-goi list'  mod='smartmarketingps'}</p>
-					</td>
-				</tr>
 			{/if}
 
 

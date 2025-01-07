@@ -142,6 +142,15 @@ class SmartMarketingPs extends Module
         ],
         [
             'is_root' => false,
+            'name' => 'Ecommerce',
+            'class_name' => 'Ecommerce',
+            'visible' => false,
+            'parent_class_name' => 'SmartMarketingPs',
+            'icon' => 'shopping_basket',
+            'position' => 0,
+        ],
+        [
+            'is_root' => false,
             'name' => 'SMS Notifications',
             'class_name' => 'SmsNotifications',
             'visible' => false,
@@ -169,7 +178,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '3.0.8';
+	    $this->version = '4.0.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -354,15 +363,132 @@ class SmartMarketingPs extends Module
             PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks");
             return false;
         }
+        if (!$this->addEgoiStates()) {
+            $this->_errors[] = $this->l("Error: Failed to add E-goi states.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::" . __CLASS__ . "::" . __FUNCTION__ . "::LINE::" . __LINE__ . "::ERROR: Failed to add E-goi states");
+            return false;
+        }
+        if (!$this->mapEgoiToPrestashopStates()) {
+            $this->_errors[] = $this->l("Error: Failed to map E-goi states to PrestaShop states.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::" . __CLASS__ . "::" . __FUNCTION__ . "::LINE::" . __LINE__ . "::ERROR: Failed to map E-goi states to PrestaShop states");
+            return false;
+        }
 
-	    // register WebService
+
+        // register WebService
 		$this->registerWebService();
 		$this->updateApp();
         PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::INSTALL OK");
 	  	return true;
 	}
 
-	function registerHooksEgoi(){
+    /**
+     * Add initial states to E-goi using PrestaShop functions
+     *
+     * @return bool
+     */
+    private function addEgoiStates()
+    {
+        $states = [
+            ['egoi_id' => 1, 'name' => 'created'],
+            ['egoi_id' => 2, 'name' => 'pending'],
+            ['egoi_id' => 3, 'name' => 'cancelled'],
+            ['egoi_id' => 4, 'name' => 'completed']
+        ];
+
+        foreach ($states as $state) {
+            if (!Db::getInstance()->insert('egoi_order_states', [
+                'egoi_id' => (int)$state['egoi_id'],
+                'name' => pSQL($state['name'])
+            ])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Mapping E-goi states with PrestaShop states
+     *
+     * @return bool
+     */
+    private function mapEgoiToPrestashopStates()
+    {
+        $egoiStateMap = Db::getInstance()->executeS('SELECT egoi_id FROM `' . _DB_PREFIX_ . 'egoi_order_states`');
+        if (!$egoiStateMap) {
+            return false;
+        }
+
+        $validEgoiIds = array_column($egoiStateMap, 'egoi_id');
+
+        $mapping = [
+            ['prestashop_state_id' => 13, 'egoi_id' => 2, 'type' => 'order'], // Awaiting Cash On Delivery validation -> pending
+            ['prestashop_state_id' => 1, 'egoi_id' => 1, 'type' => 'order'],  // Awaiting check payment -> created
+            ['prestashop_state_id' => 6, 'egoi_id' => 3, 'type' => 'order'],  // Cancelled -> cancelled
+            ['prestashop_state_id' => 5, 'egoi_id' => 4, 'type' => 'order'],  // Delivered -> completed
+            ['prestashop_state_id' => 12, 'egoi_id' => 2, 'type' => 'order'], // On backorder (not paid) -> pending
+            ['prestashop_state_id' => 9, 'egoi_id' => 2, 'type' => 'order'],  // On backorder (paid) -> pending
+            ['prestashop_state_id' => 2, 'egoi_id' => 1, 'type' => 'order'],  // Payment accepted -> created
+            ['prestashop_state_id' => 8, 'egoi_id' => 3, 'type' => 'order'],  // Payment error -> cancelled
+            ['prestashop_state_id' => 3, 'egoi_id' => 2, 'type' => 'order'],  // Processing in progress -> pending
+            ['prestashop_state_id' => 7, 'egoi_id' => 3, 'type' => 'order'],  // Refunded -> cancelled
+            ['prestashop_state_id' => 11, 'egoi_id' => 2, 'type' => 'order'], // Remote payment accepted -> pending
+            ['prestashop_state_id' => 4, 'egoi_id' => 4, 'type' => 'order'],  // Shipped -> completed
+            ['prestashop_state_id' => 14, 'egoi_id' => 1, 'type' => 'order'], // TesteLuis -> created
+        ];
+
+        $orderStates = OrderState::getOrderStates((int)$this->context->language->id);
+
+        foreach ($orderStates as $state) {
+            $map = null;
+            foreach ($mapping as $item) {
+                if ($item['prestashop_state_id'] == $state['id_order_state']) {
+                    $map = $item;
+                    break;
+                }
+            }
+
+            if (!$map) {
+                $map = ['prestashop_state_id' => $state['id_order_state'], 'egoi_id' => 1, 'type' => 'order']; // Default to 'created' state
+            }
+
+            if (!in_array($map['egoi_id'], $validEgoiIds)) {
+                continue;
+            }
+
+            if (!Db::getInstance()->insert('egoi_prestashop_order_state_map', [
+                'prestashop_state_id' => (int)$map['prestashop_state_id'],
+                'egoi_state_id' => (int)$map['egoi_id'],
+                'type' => pSQL($map['type']),
+                'active' => 1,
+            ])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function getEgoiOrderStatusName($prestashopStateId)
+    {
+        // Query para buscar o egoi_state_id correspondente ao prestashopStateId
+        $sql = 'SELECT es.name 
+            FROM ' . _DB_PREFIX_ . 'egoi_prestashop_order_state_map AS map
+            INNER JOIN ' . _DB_PREFIX_ . 'egoi_order_states AS es
+                ON map.egoi_state_id = es.egoi_id
+            WHERE map.prestashop_state_id = ' . (int)$prestashopStateId . ' 
+              AND map.active = 1';
+
+        // Retorna diretamente o nome encontrado ou null
+        return Db::getInstance()->getValue($sql);
+    }
+
+
+
+
+
+    function registerHooksEgoi(){
         return $this->registerHook(
             array(
                 'cart',
@@ -389,7 +515,7 @@ class SmartMarketingPs extends Module
         );
     }
 
-	/**
+    /**
 	 * Install required Tables
 	 *
 	 * @return bool
@@ -829,7 +955,12 @@ class SmartMarketingPs extends Module
        		Db::getInstance()->execute('DROP TABLE IF EXISTS '.$name);
    		}
 
-   		// remove menus
+        // Drop trigger of the order status from the plugin
+        foreach ($sqlTrigger as $triggerName => $value) {
+                Db::getInstance()->execute('DROP TRIGGER IF EXISTS ' . $triggerName);
+        }
+
+        // remove menus
    		$this->removeMenu();
 
    		// remove API Key in cache
@@ -1092,7 +1223,8 @@ class SmartMarketingPs extends Module
      */
 	public function hookActionOrderStatusPostUpdate($params)
     {
-        $this->syncOrderTE($params);
+        //$this->syncOrderTE($params);
+        $this->syncOrderAPI($params);
         return $this->sendSmsNotification($params);
     }
 
@@ -2172,6 +2304,17 @@ class SmartMarketingPs extends Module
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
 
+    /*
+     * Count size of list of orders by store
+     */
+    public static function sizeListOrders()
+    {
+        $sql = 'SELECT COUNT(*) as total, id_shop FROM '. _DB_PREFIX_ . 'orders WHERE current_state != 0 GROUP BY id_shop';
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+    }
+
+
     /**
 	 * Update customer
 	 *
@@ -2771,6 +2914,104 @@ class SmartMarketingPs extends Module
 		);
 		return true;
 	}
+
+    //Function to Sync Order By APIv3
+    private function syncOrderAPI($params) {
+
+        $res = self::getClientData('track', 1);
+        if (empty($res['track'])) {
+            return false;
+        }
+
+        $order = new Order($params['id_order']);
+        $products = $order->getProducts();
+
+        if(!empty($res['track_state'])){
+            if($res['track_state'] != $params['newOrderStatus']->id){
+                return false;
+            }
+        }
+
+        $this->apiv3 = new ApiV3();
+
+        $order = self::formatOrder($order, $products);
+        $apiv3 = new ApiV3();
+        $apiv3->convertOrder(_PS_BASE_URL_, $order);
+    }
+
+    private function formatOrder($order, $products) {
+        $customer = new Customer($order->id_customer);
+
+        $formattedOrder = [
+            "order_total" => (float)$order->total_paid,
+            "order_id" => (string)$order->id,
+            "cart_id" => (float)$order->id_cart,
+            "order_status" => self::getEgoiOrderStatusName($order->current_state),
+            "order_date" => $order->date_add,
+            "contact" => $this->formatContact($customer),
+            "products" => []
+        ];
+
+        foreach ($products as $product) {
+            $formattedOrder['products'][] = [
+                "product_identifier" => $product['id_product'] ?? "",
+                "name" => $product['product_name'] ?? "",
+                "description" => $product['product_description'] ?? "",
+                "sku" => $product['reference'] ?? "",
+                "price" => (float)$product['price'], // Convertendo para float
+                "sale_price" => (float)($product['reduction_price'] ?? $product['price']),
+            ];
+        }
+
+        return $formattedOrder;
+    }
+
+    private function formatContact($customer) {
+
+        return [
+            "base" => [
+                "status" => "active",
+                "first_name" => $customer->firstname ?? '',
+                "last_name" => $customer->lastname ?? '',
+                "email" => $customer->email ?? '',
+                "birth_date" => $customer->birthday ?? '',
+            ]
+        ];
+    }
+
+    private function getEgoiUid($customer) {
+        $uid = Db::getInstance()->getValue(
+            'SELECT uid FROM ' . _DB_PREFIX_ . "egoi_customer_uid WHERE email='" . pSQL($customer->email) . "';"
+        );
+
+        if (!empty($uid)) {
+            return $uid;
+        }
+
+        $res = self::getClientData();
+        $list_id = $res['list_id'];
+        $data = $this->formatContact($customer);
+
+        $uid = $this->apiv3->searchContactByEmail($customer->email, $list_id);
+        if (!empty($uid)) {
+            Db::getInstance()->insert('egoi_customer_uid', [
+                'uid' => $uid,
+                'email' => pSQL($customer->email)
+            ]);
+            $this->apiv3->patchContact($list_id, $uid, $data);
+        } else {
+            $contact = $this->apiv3->createContact($list_id, $data);
+            if (!empty($contact['contact_id'])) {
+                $uid = $contact['contact_id'];
+                Db::getInstance()->insert('egoi_customer_uid', [
+                    'uid' => $uid,
+                    'email' => pSQL($data['base']['email'])
+                ]);
+            }
+        }
+
+        return $uid ?? null;
+    }
 
 
     private function syncOrderTE($params) {
