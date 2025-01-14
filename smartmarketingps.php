@@ -435,7 +435,6 @@ class SmartMarketingPs extends Module
             ['prestashop_state_id' => 7, 'egoi_id' => 3, 'type' => 'order'],  // Refunded -> cancelled
             ['prestashop_state_id' => 11, 'egoi_id' => 2, 'type' => 'order'], // Remote payment accepted -> pending
             ['prestashop_state_id' => 4, 'egoi_id' => 4, 'type' => 'order'],  // Shipped -> completed
-            ['prestashop_state_id' => 14, 'egoi_id' => 1, 'type' => 'order'], // TesteLuis -> created
         ];
 
         $orderStates = OrderState::getOrderStates((int)$this->context->language->id);
@@ -2936,7 +2935,13 @@ class SmartMarketingPs extends Module
 
         $order = self::formatOrder($order, $products);
         $apiv3 = new ApiV3();
-        $apiv3->convertOrder(_PS_BASE_URL_, $order);
+
+        //Get Domain
+        $baseUrl = _PS_BASE_URL_;
+        $parsedUrl = parse_url($baseUrl);
+        $domain = $parsedUrl['host'] ?? '';
+
+        $apiv3->convertOrder($domain, $order);
     }
 
     private function formatOrder($order, $products) {
@@ -2958,8 +2963,9 @@ class SmartMarketingPs extends Module
                 "name" => $product['product_name'] ?? "",
                 "description" => $product['product_description'] ?? "",
                 "sku" => $product['reference'] ?? "",
-                "price" => (float)$product['price'], // Convertendo para float
+                "price" => (float)$product['price'],
                 "sale_price" => (float)($product['reduction_price'] ?? $product['price']),
+                "quantity" => (int)$product['product_quantity']
             ];
         }
 

@@ -106,7 +106,7 @@ class EcommerceController extends SmartMarketingBaseController
             // Carregar os dados das orders no template ecommerce
             $this->context->smarty->assign(['statesData' => $statesData,]);
 
-            // Carregar a página
+            // Load the page
             $this->assign('content', $this->fetch('ecommerce.tpl'));
         }
     }
@@ -242,14 +242,12 @@ class EcommerceController extends SmartMarketingBaseController
         $current_page = (int) Tools::getValue("orders", 0);
         $buff = 1000;
 
-        // Primeiro, vamos obter o total de pedidos para esta loja
         $count_sql = 'SELECT COUNT(DISTINCT o.id_order) as total 
                   FROM ' . _DB_PREFIX_ . 'orders o 
                   WHERE o.id_shop = ' . $store_id;
 
         $total_orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($count_sql);
 
-        // Query SQL with proper pagination
         $sql = 'SELECT o.id_order, o.reference, o.total_paid, o.date_add, o.current_state, o.id_shop AS store_id, 
                 c.email AS customer_email, od.product_id, od.product_name, 
                 od.product_quantity, od.unit_price_tax_incl AS product_price, 
@@ -318,10 +316,10 @@ class EcommerceController extends SmartMarketingBaseController
         $has_more = $processed_count < $total_orders;
 
         echo json_encode([
-            'imported' => $current_page + 1,  // Retorna o número da próxima página
-            'count' => count($importOrders),  // Número real de pedidos processados neste lote
-            'total_orders' => $total_orders,  // Total de pedidos para esta loja
-            'has_more' => $has_more          // Indica se ainda há mais pedidos para processar
+            'imported' => $current_page + 1,
+            'count' => count($importOrders),
+            'total_orders' => $total_orders,
+            'has_more' => $has_more
         ]);
         exit;
     }
