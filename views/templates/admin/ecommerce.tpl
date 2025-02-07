@@ -10,12 +10,12 @@
 
 <div class="panel">
     <div class="egoi panel-heading">
-        <span class="baseline">{l s='Ecommerce Configurations' mod='smartmarketingps'}</span>
+        <span class="baseline">{l s='Ecommerce configurations' mod='smartmarketingps'}</span>
     </div>
     <form method="post">
         <table class="table" id="egoi-subs-table">
             <tr valign="top">
-                <th class="egoi-td" scope="row">{l s='Sync existing Orders' mod='smartmarketingps'}</th>
+                <th class="egoi-td" scope="row">{l s='Sync existing orders' mod='smartmarketingps'}</th>
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <button type="button" class="btn btn-info" id="sync_old_orders">
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                     </div>
-                    <p class="help">{l s='This will import all your Prestashop Orders to E-goi' mod='smartmarketingps'}</p>
+                    <p class="help">{l s='This option will import all your Prestashop orders into E-goi contacts. If the contact does not exist in the list, it will be created along with the respective order.' mod='smartmarketingps'}</p>
                 </td>
             </tr>
             <tr style="display:none;">
@@ -46,11 +46,11 @@
 </div>
 
 <div class="panel">
-    <div class="panel-heading">{l s='Order States' mod='smartmarketingps'}</div>
+    <div class="panel-heading">{l s='Mapping of order states' mod='smartmarketingps'}</div>
     <div class="panel-info">
         <p class="help">
             <i class="icon-info-circle"></i>
-            {l s='Here you can map Prestashop order statuses to the statuses accepted by E-goi.' mod='smartmarketingps'}
+            {l s='Here you can map Prestashop order statuses with the statuses accepted by E-goi. These will be the statuses that appear in the E-goi contact.' mod='smartmarketingps'}
         </p>
     </div>
     <form method="post">
@@ -58,7 +58,7 @@
             <thead>
             <tr>
                 <th>{l s='ID' mod='smartmarketingps'}</th>
-                <th>{l s='Name' mod='smartmarketingps'}</th>
+                <th>{l s='Prestashop State' mod='smartmarketingps'}</th>
                 <th>{l s='E-goi State' mod='smartmarketingps'}</th>
             </tr>
             </thead>

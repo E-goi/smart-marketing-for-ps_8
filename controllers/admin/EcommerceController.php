@@ -31,7 +31,7 @@ class EcommerceController extends SmartMarketingBaseController
 
         $this->bootstrap = true;
         $this->cfg = 0;
-        $this->meta_title = $this->l('Ecommerce').' - '.$this->module->displayName;
+        $this->meta_title = $this->l('E-commerce').' - '.$this->module->displayName;
 
         if (!$this->module->active) {
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
