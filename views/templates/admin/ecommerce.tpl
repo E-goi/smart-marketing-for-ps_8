@@ -10,7 +10,7 @@
 
 <div class="panel">
     <div class="egoi panel-heading">
-        <span class="baseline">{l s='Ecommerce configurations' mod='smartmarketingps'}</span>
+        <span class="baseline">{l s='E-commerce configurations' mod='smartmarketingps'}</span>
     </div>
     <form method="post">
         <table class="table" id="egoi-subs-table">

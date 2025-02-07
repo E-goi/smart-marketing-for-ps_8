@@ -51,7 +51,7 @@ $_MODULE['<{smartmarketingps}prestashop>productscontroller_908e687047b7ccf0701b3
 $_MODULE['<{smartmarketingps}prestashop>productscontroller_fb2c89751238a56cf252cf67dd760c6b'] = 'La moneda del catálogo seleccionado no está activa en su tienda.';
 $_MODULE['<{smartmarketingps}prestashop>productscontroller_33c6458a2af4c6538d7d851fd7d006b1'] = 'Los productos se importaron con éxito a E-goi';
 $_MODULE['<{smartmarketingps}prestashop>productscontroller_c7160895d491fd15123ce3c811a51a7c'] = '¡Error! Algunos productos no fueron importados a E-goi';
-$_MODULE['<{smartmarketingps}prestashop>ecommerce_32138f446e4b7e53ed720d45b8b978e0'] = 'Configuraciones de E-commerce';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_c8fa4c6fb4ca3a1956e1be4ae0ca58a2'] = 'Configuraciones de E-commerce';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_1d3d66002406f977606f32760c39f47e'] = 'Sincronizar pedidos existentes	';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_31bb5929dfddc4a33bfb7d035e4d7be0'] = 'Sincronizar Pedidos	';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_5e373060211e03ca3bb712b4b81a6f2b'] = 'Esta opción importará todos sus pedidos de Prestashop a los contactos de E-goi. Si el contacto no existe en la lista, se creará junto con el pedido correspondiente.';
