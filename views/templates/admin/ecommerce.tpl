@@ -83,8 +83,8 @@
                                         {l s='Pending' mod='smartmarketingps'}
                                     {elseif $egoiState.name == 'completed'}
                                         {l s='Completed' mod='smartmarketingps'}
-                                    {elseif $egoiState.name == 'completed'}
-                                        {l s='Cancelled' mod='smartmarketingps'}
+                                    {elseif $egoiState.name == 'canceled'}
+                                        {l s='Canceled' mod='smartmarketingps'}
                                     {else}
                                         {l s='Created' mod='smartmarketingps'}
                                     {/if}

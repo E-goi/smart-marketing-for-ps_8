@@ -392,7 +392,7 @@ class SmartMarketingPs extends Module
         $states = [
             ['egoi_id' => 1, 'name' => 'created'],
             ['egoi_id' => 2, 'name' => 'pending'],
-            ['egoi_id' => 3, 'name' => 'cancelled'],
+            ['egoi_id' => 3, 'name' => 'canceled'],
             ['egoi_id' => 4, 'name' => 'completed']
         ];
 
@@ -2980,7 +2980,6 @@ class SmartMarketingPs extends Module
                 "first_name" => $customer->firstname ?? '',
                 "last_name" => $customer->lastname ?? '',
                 "email" => $customer->email ?? '',
-                "birth_date" => $customer->birthday ?? '',
             ]
         ];
     }
