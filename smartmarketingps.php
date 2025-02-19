@@ -393,7 +393,8 @@ class SmartMarketingPs extends Module
             ['egoi_id' => 1, 'name' => 'created'],
             ['egoi_id' => 2, 'name' => 'pending'],
             ['egoi_id' => 3, 'name' => 'canceled'],
-            ['egoi_id' => 4, 'name' => 'completed']
+            ['egoi_id' => 4, 'name' => 'completed'],
+            ['egoi_id' => 5, 'name' => 'unknown']
         ];
 
         foreach ($states as $state) {
@@ -449,7 +450,7 @@ class SmartMarketingPs extends Module
             }
 
             if (!$map) {
-                $map = ['prestashop_state_id' => $state['id_order_state'], 'egoi_id' => 1, 'type' => 'order']; // Default to 'created' state
+                $map = ['prestashop_state_id' => $state['id_order_state'], 'egoi_id' => 5, 'type' => 'order']; // Default to 'created' state
             }
 
             if (!in_array($map['egoi_id'], $validEgoiIds)) {
