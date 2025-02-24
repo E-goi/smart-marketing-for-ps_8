@@ -178,7 +178,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '5.0.0';
+	    $this->version = '4.0.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -407,6 +407,12 @@ class SmartMarketingPs extends Module
         }
 
         return true;
+    }
+
+
+    public function upgradeOrderStateTemplates()
+    {
+        return $this->mapOrderStateTemplates();
     }
 
     /**
@@ -886,6 +892,38 @@ class SmartMarketingPs extends Module
             }
         }
     }
+
+    /**
+     * Update menu
+     *
+     * @return bool
+     */
+    public function updateMenu()
+    {
+        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: Removing old menu...");
+
+        $this->removeMenu();
+
+        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: Adding new menu...");
+
+        foreach ($this->menus as $menu) {
+            $this->addTab(
+                $menu['class_name'],
+                $menu['name'],
+                $menu['parent_class_name'],
+                $menu['icon'],
+                $menu['visible'],
+                $menu['position']
+            );
+        }
+
+        $this->updateApp();
+        $this->enableMenus();
+        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: Menu updated successfully.");
+        return true;
+    }
+
+
 
     /**
 	 * Create menu
@@ -2959,22 +2997,31 @@ class SmartMarketingPs extends Module
             "products" => []
         ];
 
-        foreach ($products as $product) {
-            $productTotal = (float) number_format(($product['price'] * $product['product_quantity']), 2, '.', '');
+        $productMap = [];
 
-            $formattedOrder['products'][] = [
-                "product_identifier" => $product['id_product'] ?? "",
-                "name" => $product['product_name'] ?? "",
-                "description" => $product['product_description'] ?? "",
-                "sku" => $product['reference'] ?? "",
-                "price" => $productTotal,
-                "sale_price" => (float)($product['reduction_price'] ?? $product['price']),
-                "quantity" => (int)$product['product_quantity']
-            ];
+        foreach ($products as $product) {
+            $productId = $product['id_product'] ?? "";
+
+            if (!isset($productMap[$productId])) {
+                $productMap[$productId] = [
+                    "product_identifier" => $productId,
+                    "name" => $product['product_name'] ?? "",
+                    "description" => $product['product_description'] ?? "",
+                    "sku" => $product['reference'] ?? "",
+                    "price" => (float)$product['price'],
+                    "sale_price" => (float)($product['reduction_price'] ?? $product['price']),
+                    "quantity" => (int)$product['product_quantity']
+                ];
+            } else {
+                $productMap[$productId]['quantity'] += (int)$product['product_quantity'];
+            }
         }
+
+        $formattedOrder['products'] = array_values($productMap);
 
         return $formattedOrder;
     }
+
 
     private function formatContact($customer) {
 
