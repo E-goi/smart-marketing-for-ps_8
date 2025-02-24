@@ -282,18 +282,20 @@ class EcommerceController extends SmartMarketingBaseController
                     'order_status' => SmartMarketingPs::getEgoiOrderStatusName($row['current_state']),
                     'revenue' => (float) $row['total_paid'],
                     'contact_id' => $row['customer_email'],
-                    'store_url' => 'https://www.e-goi.com',
+                    'store_url' => Context::getContext()->shop->getBaseURL(true),
                     'date' => $row['date_add'],
                     'items' => [],
                 ];
             }
 
             if (!empty($row['product_id']) && !empty($row['product_name'])) {
+                $product_total = (float) $row['product_price'] * (int) $row['product_quantity'];
+
                 $ordersGrouped[$orderId]['items'][] = [
                     'id' => (string) $row['product_id'],
                     'name' => $row['product_name'],
                     'category' => (string) ($row['id_category_default'] ?? ''),
-                    'price' => (float) $row['product_price'],
+                    'price' => $product_total,
                     'quantity' => (int) $row['product_quantity'],
                 ];
             }

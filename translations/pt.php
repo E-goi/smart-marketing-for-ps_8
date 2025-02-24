@@ -61,10 +61,11 @@ $_MODULE['<{smartmarketingps}prestashop>ecommerce_b718adec73e04ce3ec720dd11a06a3
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_5400ce902445f8e0eef367d67a118148'] = 'Estado no Prestashop';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_f42681791629a8b7eb7d68ae8ddbcbf9'] = 'Estado no E-goi';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_3a6c61a1effb84eb88b75fc65ee85b17'] = 'Selecione Estado E-goi';
-$_MODULE['<{smartmarketingps}prestashop>ecommerce_0eceeb45861f9585dd7a97a3e36f85c6'] = 'Criado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_0eceeb45861f9585dd7a97a3e36f85c6'] = 'Criada';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_2d13df6f8b5e4c5af9f87e0dc39df69d'] = 'Pendente';
-$_MODULE['<{smartmarketingps}prestashop>ecommerce_07ca5050e697392c9ed47e6453f1453f'] = 'Completo';
-$_MODULE['<{smartmarketingps}prestashop>ecommerce_0e22fe7d45f8e5632a4abf369b24e29c'] = 'Cancelado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_07ca5050e697392c9ed47e6453f1453f'] = 'Completa';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_0e22fe7d45f8e5632a4abf369b24e29c'] = 'Cancelada';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_88183b946cc5f0e8c96b2e66e1c74a7e'] = 'Desconhecida';
 $_MODULE['<{smartmarketingps}prestashop>account_3771bf858c98d52dbc5d250dd1f4e72f'] = 'Dados da conta';
 $_MODULE['<{smartmarketingps}prestashop>account_76525f0f34b48475e5ca33f71d296f3b'] = 'ID';
 $_MODULE['<{smartmarketingps}prestashop>account_e7b47c58815acf1d3afa59a84b5db7fb'] = 'Nome da empresa';

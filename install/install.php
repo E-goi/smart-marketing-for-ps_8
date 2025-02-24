@@ -116,7 +116,7 @@ $sql[_DB_PREFIX_.'egoi_after_order_state_insert'] = '
     BEGIN
         INSERT INTO '._DB_PREFIX_.'egoi_prestashop_order_state_map 
         (prestashop_state_id, egoi_state_id, type, active)
-        VALUES (NEW.id_order_state, 1, "order", 1);
+        VALUES (NEW.id_order_state, 5, "order", 1);
     END;
 ';
 

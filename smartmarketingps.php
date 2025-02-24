@@ -142,7 +142,7 @@ class SmartMarketingPs extends Module
         ],
         [
             'is_root' => false,
-            'name' => 'E-commerce',
+            'name' => 'E-commerce (New)',
             'class_name' => 'Ecommerce',
             'visible' => false,
             'parent_class_name' => 'SmartMarketingPs',
@@ -178,7 +178,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '4.0.0';
+	    $this->version = '5.0.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -430,6 +430,7 @@ class SmartMarketingPs extends Module
             ['prestashop_state_id' => 5, 'egoi_id' => 4, 'type' => 'order'],  // Delivered -> completed
             ['prestashop_state_id' => 12, 'egoi_id' => 2, 'type' => 'order'], // On backorder (not paid) -> pending
             ['prestashop_state_id' => 9, 'egoi_id' => 2, 'type' => 'order'],  // On backorder (paid) -> pending
+            ['prestashop_state_id' => 10, 'egoi_id' => 2, 'type' => 'order'],  // On backorder (paid) -> pending
             ['prestashop_state_id' => 2, 'egoi_id' => 1, 'type' => 'order'],  // Payment accepted -> created
             ['prestashop_state_id' => 8, 'egoi_id' => 3, 'type' => 'order'],  // Payment error -> cancelled
             ['prestashop_state_id' => 3, 'egoi_id' => 2, 'type' => 'order'],  // Processing in progress -> pending
@@ -450,7 +451,7 @@ class SmartMarketingPs extends Module
             }
 
             if (!$map) {
-                $map = ['prestashop_state_id' => $state['id_order_state'], 'egoi_id' => 5, 'type' => 'order']; // Default to 'created' state
+                $map = ['prestashop_state_id' => $state['id_order_state'], 'egoi_id' => 5, 'type' => 'order']; // Default to 'unknown' state
             }
 
             if (!in_array($map['egoi_id'], $validEgoiIds)) {
@@ -2959,12 +2960,14 @@ class SmartMarketingPs extends Module
         ];
 
         foreach ($products as $product) {
+            $productTotal = (float) number_format(($product['price'] * $product['product_quantity']), 2, '.', '');
+
             $formattedOrder['products'][] = [
                 "product_identifier" => $product['id_product'] ?? "",
                 "name" => $product['product_name'] ?? "",
                 "description" => $product['product_description'] ?? "",
                 "sku" => $product['reference'] ?? "",
-                "price" => (float)$product['price'],
+                "price" => $productTotal,
                 "sale_price" => (float)($product['reduction_price'] ?? $product['price']),
                 "quantity" => (int)$product['product_quantity']
             ];

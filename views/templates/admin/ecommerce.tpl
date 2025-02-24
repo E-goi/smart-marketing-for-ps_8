@@ -73,7 +73,7 @@
                     </td>
                     <td>
                         <select name="egoi_state_mappings[{$state.id}]" class="form-control egoi-state-dropdown">
-                            <option value="">{l s='Select E-goi state' mod='smartmarketingps'}</option>
+                            <option value="" disabled>{l s='Select E-goi state' mod='smartmarketingps'}</option>
                             {foreach from=$state.egoi_states item=egoiState}
                                 <option value="{$egoiState.egoi_id|escape:'htmlall':'UTF-8'}"
                                         {if $state.egoi_state_id == $egoiState.egoi_id}selected{/if}>
@@ -86,7 +86,7 @@
                                     {elseif $egoiState.name == 'canceled'}
                                         {l s='Canceled' mod='smartmarketingps'}
                                     {else}
-                                        {l s='Created' mod='smartmarketingps'}
+                                        {l s='Unknown' mod='smartmarketingps'}
                                     {/if}
                                 </option>
                             {/foreach}
