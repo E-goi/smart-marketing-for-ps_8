@@ -249,16 +249,16 @@ class EcommerceController extends SmartMarketingBaseController
         $total_orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($count_sql);
 
         $sql = 'SELECT o.id_order, o.reference, o.total_paid, o.date_add, o.current_state, o.id_shop AS store_id, 
-            c.email AS customer_email, od.product_id, od.product_name, 
-            od.product_quantity, od.unit_price_tax_incl AS product_price, 
-            p.id_category_default 
-    FROM ' . _DB_PREFIX_ . 'orders o
-    LEFT JOIN ' . _DB_PREFIX_ . 'customer c ON o.id_customer = c.id_customer
-    LEFT JOIN ' . _DB_PREFIX_ . 'order_detail od ON o.id_order = od.id_order
-    LEFT JOIN ' . _DB_PREFIX_ . 'product p ON od.product_id = p.id_product
-    WHERE o.id_shop = ' . $store_id . ' 
-    ORDER BY o.id_order, od.product_id
-    LIMIT ' . ($current_page * $buff) . ', ' . $buff;
+                c.email AS customer_email, od.product_id, od.product_attribute_id, od.product_name, 
+                od.product_quantity, od.unit_price_tax_incl AS product_price, 
+                p.id_category_default, od.product_reference, od.reduction_amount
+            FROM ' . _DB_PREFIX_ . 'orders o
+            LEFT JOIN ' . _DB_PREFIX_ . 'customer c ON o.id_customer = c.id_customer
+            LEFT JOIN ' . _DB_PREFIX_ . 'order_detail od ON o.id_order = od.id_order
+            LEFT JOIN ' . _DB_PREFIX_ . 'product p ON od.product_id = p.id_product
+            WHERE o.id_shop = ' . $store_id . ' 
+            ORDER BY o.id_order, od.product_id, od.product_attribute_id
+            LIMIT ' . ($current_page * $buff) . ', ' . $buff;
 
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
@@ -289,20 +289,21 @@ class EcommerceController extends SmartMarketingBaseController
 
             if (!empty($row['product_id']) && !empty($row['product_name'])) {
                 $productId = (string) $row['product_id'];
-                $quantity = (int) $row['product_quantity'];
+                $attributeId = (string) ($row['product_attribute_id'] ?? ""); // ID da variação
+                $productReference = $row['product_reference'] ?? "";
+                $productName = trim($row['product_name']);
 
-                if (!isset($ordersGrouped[$orderId]['items'][$productId])) {
-                    $ordersGrouped[$orderId]['items'][$productId] = [
-                        'id' => $productId,
-                        'name' => $row['product_name'],
-                        'category' => (string) ($row['id_category_default'] ?? ''),
-                        'price' => (float) $row['product_price'],
-                        'quantity' => $quantity,
-                    ];
-                } else {
-                    // If the product already exists in the order, we just add the quantity
-                    $ordersGrouped[$orderId]['items'][$productId]['quantity'] += $quantity;
-                }
+                $uniqueProductId = !empty($attributeId) ? "{$productId}_{$attributeId}" : $productId;
+
+                $ordersGrouped[$orderId]['items'][$uniqueProductId] = [
+                    'id' => $uniqueProductId,
+                    'name' => $productName,
+                    'category' => (string) ($row['id_category_default'] ?? ''),
+                    'sku' => $productReference ?: "",
+                    'price' => (float) $row['product_price'],
+                    'sale_price' => (float) ($row['reduction_amount'] ?? $row['product_price']),
+                    'quantity' => ($ordersGrouped[$orderId]['items'][$uniqueProductId]['quantity'] ?? 0) + (int) $row['product_quantity'],
+                ];
             }
         }
 

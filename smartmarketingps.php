@@ -2997,27 +2997,28 @@ class SmartMarketingPs extends Module
             "products" => []
         ];
 
-        $productMap = [];
+        $productList = [];
 
         foreach ($products as $product) {
             $productId = $product['id_product'] ?? "";
+            $attributeId = $product['product_attribute_id'] ?? "";
+            $productReference = $product['product_reference'] ?? "";
+            $productName = trim($product['product_name'] ?? "");
 
-            if (!isset($productMap[$productId])) {
-                $productMap[$productId] = [
-                    "product_identifier" => $productId,
-                    "name" => $product['product_name'] ?? "",
-                    "description" => $product['product_description'] ?? "",
-                    "sku" => $product['reference'] ?? "",
-                    "price" => (float)$product['price'],
-                    "sale_price" => (float)($product['reduction_price'] ?? $product['price']),
-                    "quantity" => (int)$product['product_quantity']
-                ];
-            } else {
-                $productMap[$productId]['quantity'] += (int)$product['product_quantity'];
-            }
+            $uniqueId = !empty($attributeId) ? "{$productId}-{$attributeId}" : $productId;
+
+            $productList[] = [
+                "product_identifier" => (string)$uniqueId,
+                "name" => $productName,
+                "description" => $product['product_description'] ?? "",
+                "sku" => $productReference,
+                "price" => (float)$product['product_price'],
+                "sale_price" => (float)($product['reduction_amount'] ?? $product['product_price']),
+                "quantity" => (int)$product['product_quantity'],
+            ];
         }
 
-        $formattedOrder['products'] = array_values($productMap);
+        $formattedOrder['products'] = $productList;
 
         return $formattedOrder;
     }
