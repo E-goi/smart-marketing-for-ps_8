@@ -289,7 +289,7 @@ class EcommerceController extends SmartMarketingBaseController
 
             if (!empty($row['product_id']) && !empty($row['product_name'])) {
                 $productId = (string) $row['product_id'];
-                $attributeId = (string) ($row['product_attribute_id'] ?? ""); // ID da variação
+                $attributeId = (string) ($row['product_attribute_id'] ?? "");
                 $productReference = $row['product_reference'] ?? "";
                 $productName = trim($row['product_name']);
 
