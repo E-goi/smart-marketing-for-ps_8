@@ -17,3 +17,4 @@ $updateql[_DB_PREFIX_.'egoi_active_catalogs_306_4'] = 'UPDATE `'._DB_PREFIX_.'ta
 $updateql[_DB_PREFIX_.'egoi_active_catalogs_306_5'] = 'UPDATE `'._DB_PREFIX_.'tab` SET `icon`=\'sync\' where `module`=\'smartmarketingps\' AND `class_name`=\'Sync\';';
 $updateql[_DB_PREFIX_.'egoi_active_catalogs_306_6'] = 'UPDATE `'._DB_PREFIX_.'tab` SET `icon`=\'textsms\' where `module`=\'smartmarketingps\' AND `class_name`=\'SmsNotifications\';';
 $updateql[_DB_PREFIX_.'egoi_active_catalogs_306_7'] = 'UPDATE `'._DB_PREFIX_.'tab` SET `icon`=\'shop\' where `module`=\'smartmarketingps\' AND `class_name`=\'Products\';';
+$updateql[_DB_PREFIX_.'egoi_active_catalogs_306_8'] = 'UPDATE `'._DB_PREFIX_.'tab` SET `icon`=\'shopping_basket\' where `module`=\'smartmarketingps\' AND `class_name`=\'Ecommerce\';';

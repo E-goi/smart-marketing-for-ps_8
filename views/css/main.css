@@ -96,7 +96,7 @@
     font-size: 30px;
 }
 
-.sync_customers, .sync_customers2, .sync_api_key, .sync_list {
+.sync_customers, .sync_customers2, .sync_api_key, .sync_list, .sync_orders {
     border: 2px solid #f3f3f3;
     margin: 0 10px;
     display: inline-block;
